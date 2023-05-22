@@ -4,3 +4,5 @@ output
 .classpath
 .project
 .settings/*
+META-INF
+*.jar

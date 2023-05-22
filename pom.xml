@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.ethz.matsim</groupId>
-    <artifactId>sioux_falls</artifactId>
+    <artifactId>matsim_gui_for_sioux_falls_vieregg</artifactId>
     <version>0.1.0</version>
 	
 	<properties>
@@ -57,4 +57,66 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+    	<plugins>
+			<plugin>
+				<!-- This plugin makes source files and javadocs available inside eclipse.  In IntelliJ, this works without plugin.-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+    		<plugin>
+<!--				The maven-shade-plugin replaces the maven-assembly-plugin to configure "mvn package". The assembly-plugin regularly-->
+<!--				creates problems when GeoTools are used, which the shade-plugin does not (see-->
+<!--				https://stackoverflow.com/questions/27429097/geotools-cannot-find-hsql-epsg-db-throws-error-nosuchauthoritycodeexception/27431381#27431381)-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.basedir}/${project.build.finalName}.jar</outputFile>
+							<transformers>
+								<!-- The following sets the main class for the executable jar as you otherwise would with the assembly plugin -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.matsim.gui.MATSimGUI</Main-Class>
+										<Class-Path>src/main/java</Class-Path>
+										<Specification-Vendor>org.matsim</Specification-Vendor>
+										<Implementation-Vendor>org.matsim</Implementation-Vendor>
+										<Implementation-Version>${project.version}</Implementation-Version>
+									</manifestEntries>
+								</transformer>
+								<!-- The following merges the various GeoTools META-INF/services files         -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+			</plugin>
+    	</plugins>
+    </build>
 </project>
